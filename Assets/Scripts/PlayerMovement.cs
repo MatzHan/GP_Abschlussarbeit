@@ -13,6 +13,10 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce = 14f;
     public LayerMask jumpableGround;
 
+    [SerializeField] private AudioSource jumpSound;
+    [SerializeField] private AudioSource PowerUpSound;
+    [SerializeField] private AudioSource PowerDownSound;
+    public GameObject PowerUp;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +25,7 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         coll = GetComponent<BoxCollider2D>();
         sprite = GetComponent<SpriteRenderer>();
+       
 
     }
 
@@ -33,6 +38,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown("space") && IsGrounded())
         {
+            jumpSound.Play();  
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
 
@@ -48,6 +54,32 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    //Powerup Logic
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+   
+        if (collision.gameObject.CompareTag("PowerUp"))
+        {
+            Destroy(collision.gameObject);
+            PowerUpSound.Play();
+            Debug.Log("Powerup taken");
+            BeHigh();
+
+        }
+    }
+    private void BeHigh()
+    {
+        jumpForce = 24f;
+        Debug.Log("Be High");
+        Invoke("NormalJump", 2f);
+    }
+
+    private void NormalJump()
+    {
+        PowerDownSound.Play();
+        jumpForce = 14f;
+        Debug.Log("Normal Jump");
+    }
     private bool IsGrounded()
     {
         //Ground-Check
